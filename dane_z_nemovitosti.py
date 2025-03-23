@@ -1,4 +1,4 @@
-import math #modul math
+import math 
 from abc import ABC, abstractmethod
 
 class Locality:
@@ -7,8 +7,6 @@ class Locality:
         self.locality_coefficient = locality_coefficient
 
 class Property(ABC):
-   
-    @abstractmethod
     def __init__(self, locality, locality_coefficient): #třída Property reprezentuje nemovitost, třída má atribut locality 
         self.locality = Locality(locality, locality_coefficient)
     
@@ -78,33 +76,26 @@ class TaxReport:
             
 
 pozemek_1 = Estate("lokalita", "Les", 500, 2)
-print(pozemek_1.calculate_tax())
 print(pozemek_1)
 
 byt_1 = Residence("Byt pro osobní bydlení", "lokalita", 60, 3)        #byt určený k bydlení
-print(byt_1.calculate_tax())
 print(byt_1)
 
 byt_2 = Residence("Byt ke komerčním účelům", "lokalita", 60, 3, True)  #byt určený ke komerčním účelům
-print(byt_2.calculate_tax())
 print(byt_2)
 
 #testy
 pozemek_2 = Estate("Manětín", "Zemědělský pozemek", 900, 0.8)
-print(pozemek_2.calculate_tax())
 print(pozemek_2)
 
 dum_1 = Residence("Dům pro osobní bydlení", "Manětín", 120, 0.8)
-print(dum_1.calculate_tax())
 print(dum_1)
 
 kancelar_1 = Residence("Kancelář", "Brno", 90, 3, True)
-print(kancelar_1.calculate_tax())
 print(kancelar_1)
 
 report = TaxReport("Jan Novák")      #výpočet daně pro poslední tři testovací subjekty
 report.add_property(pozemek_2)
 report.add_property(dum_1)
 report.add_property(kancelar_1)
-print(report.calculate_tax())
 print(report)
