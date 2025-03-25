@@ -7,9 +7,8 @@ class Locality:
         self.locality_coefficient = locality_coefficient
 
 class Property(ABC):
-    def __init__(self, locality, locality_coefficient): #třída Property reprezentuje nemovitost, třída má atribut locality 
-        self.locality = Locality(locality, locality_coefficient)
-    
+    def __init__(self, locality): #třída Property reprezentuje nemovitost, třída má atribut locality 
+        self.locality = locality
     @abstractmethod
     def calculate_tax(self): #Abstraktní metoda pro výpočet daně.
         pass
@@ -19,31 +18,39 @@ class Property(ABC):
         pass
 
 class Estate(Property):
-    def __init__(self, locality, estate_type, area, locality_coefficient):
-        super().__init__(locality, locality_coefficient)
+    def __init__(self, locality, estate_type, area):
+        super().__init__(locality)
         self.estate_type = estate_type
         self.area = area
 
     def calculate_tax(self):
-        if self.estate_type == "Zemědělský pozemek":
-            koeficient = 0.85
-        if self.estate_type == "Stavební pozemek":
-            koeficient = 9
-        if self.estate_type == "Les":
-            koeficient = 0.35
-        if self.estate_type == "Zahrada":
-            koeficient = 2
+        estate_types = {
+            "Zemědělský pozemek": 0.85,
+            "Stavební pozemek": 9,
+            "Les": 0.35,
+            "Zahrada": 2
+        }
 
+     
+        # Získání koeficientu z dictionary, pokud existuje
+        koeficient = estate_types.get(self.estate_type, None)
+    
+        if koeficient is None:
+        # Pokud nebyl nalezen odpovídající typ nemovitosti, můžeme přidat výchozí hodnotu nebo chybu
+            raise ValueError(f"Neznámý typ nemovitosti: {self.estate_type}")
         dan_z_nemovitosti = self.area * koeficient * self.locality.locality_coefficient #vzorec pro výpočet daně
+        
         return math.ceil(dan_z_nemovitosti) #tak aby hodnota daně byla zobrazená jako celé číslo
     
     def __str__(self):
         return f'{self.estate_type}, lokalita {self.locality.name}, koeficient {self.locality.locality_coefficient}, {self.area} metrů čtverečních, daň {self.calculate_tax()} Kč.'
 
 class Residence(Property):
-    def __init__(self, type, locality, area, locality_coefficient, commercial=False):
-        super().__init__(locality, locality_coefficient)
-        self.type = type
+   
+    def __init__(self, locality, estate_type, area, commercial=False):
+        super().__init__(locality)
+
+        self.type = estate_type
         self.area = area
         self.commercial = commercial
     
@@ -75,23 +82,23 @@ class TaxReport:
         return f'{self.name} bude odvádět daň ve výši {self.calculate_tax()} Kč.' 
             
 
-pozemek_1 = Estate("lokalita", "Les", 500, 2)
+pozemek_1 = Estate(Locality("lokalita", 2), "Les", 500)
 print(pozemek_1)
 
-byt_1 = Residence("Byt pro osobní bydlení", "lokalita", 60, 3)        #byt určený k bydlení
+byt_1 = Residence(Locality("lokalita", 3), "Byt pro osobní bydlení", 60)        #byt určený k bydlení
 print(byt_1)
 
-byt_2 = Residence("Byt ke komerčním účelům", "lokalita", 60, 3, True)  #byt určený ke komerčním účelům
+byt_2 = Residence(Locality("lokalita", 3), "Byt ke komerčním účelům", 60, True)  #byt určený ke komerčním účelům
 print(byt_2)
 
 #testy
-pozemek_2 = Estate("Manětín", "Zemědělský pozemek", 900, 0.8)
+pozemek_2 = Estate(Locality("Manětín", 0.8), "Zemědělský pozemek", 900)
 print(pozemek_2)
 
-dum_1 = Residence("Dům pro osobní bydlení", "Manětín", 120, 0.8)
+dum_1 = Residence(Locality("Manětín", 0.8), "Dům pro osobní bydlení", 120)
 print(dum_1)
 
-kancelar_1 = Residence("Kancelář", "Brno", 90, 3, True)
+kancelar_1 = Residence(Locality("Brno", 3), "Kancelář", 90, True)
 print(kancelar_1)
 
 report = TaxReport("Jan Novák")      #výpočet daně pro poslední tři testovací subjekty
